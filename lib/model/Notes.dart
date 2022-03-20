@@ -1,10 +1,11 @@
 import 'package:floor/floor.dart';
+
 @entity
 class Notes {
-  @primaryKey
+  @PrimaryKey(autoGenerate: true)
   int? id;
   String? title;
   String? description;
 
-  Notes(this.id, this.title, this.description);
+  Notes({this.id, this.title, this.description});
 }

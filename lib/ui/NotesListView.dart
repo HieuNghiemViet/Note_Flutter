@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:note_futter/model/FolderNotes.dart';
+import '../db/NotesDao.dart';
+import '../db/NotesDatabase.dart';
 import '../model/Notes.dart';
 
 class NotesListView extends StatefulWidget {
@@ -10,7 +11,26 @@ class NotesListView extends StatefulWidget {
 }
 
 class _NotesListViewState extends State<NotesListView> {
-  FolderNotes? _folderNotes;
+  Notes? _notes;
+
+  NotesDao? _notesDao;
+
+  @override
+  void initState() {
+    initNotesDatabase();
+  }
+
+  Future<void> initNotesDatabase() async {
+    final database =
+        await $FloorNotesDatabase.databaseBuilder('notes_database.db').build();
+    _notesDao = database.notesDao;
+
+    final note = Notes(id: 1, title: 'HieuNV');
+
+    await _notesDao?.insertNote(note);
+    final result = await _notesDao!.findNotesById(1);
+    print('HieuNVV: ' + result.toString());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +41,18 @@ class _NotesListViewState extends State<NotesListView> {
         return Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => {print('HieuNV: onClick')},
+            onTap: () => {
+              Navigator.pushNamed(
+                context,
+                '/notes_detail',
+             // arguments: _notes!.description
+              )
+            },
             onLongPress: () => {print('HieuNV: onLongClick')},
             child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),child: rowList()),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                child: rowList()),
           ),
         );
       },
@@ -45,7 +73,7 @@ class _NotesListViewState extends State<NotesListView> {
         Icon(Icons.folder_outlined, color: Colors.yellow, size: 24),
         SizedBox(width: 14),
         Expanded(
-            child: Text('_folderNotes!.nameFolder',
+            child: Text('_notes!.title!.toString()',
                 style: TextStyle(color: Colors.white, fontSize: 20))),
         Text('6', style: TextStyle(color: Colors.grey, fontSize: 20)),
       ],

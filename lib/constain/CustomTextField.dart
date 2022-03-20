@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 class CustomTextField extends StatelessWidget {
   bool? prefixIcon;
   String? hintText;
+  final controller = TextEditingController();
 
   CustomTextField({this.prefixIcon, this.hintText = 'Tìm kiếm'});
-
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      controller: controller,
       autofocus: true,
       style: const TextStyle(color: Colors.white, fontSize: 10),
       cursorColor: Colors.white,

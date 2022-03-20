@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:note_futter/constain/CustomTextField.dart';
 import 'package:note_futter/constain/String.dart';
+import 'package:note_futter/db/NotesDao.dart';
+import 'package:note_futter/db/NotesDatabase.dart';
 import 'package:note_futter/ui/NotesListView.dart';
 import 'dialog/CreateFolderDialog.dart';
 
@@ -13,6 +15,8 @@ class HomeNote extends StatefulWidget {
 }
 
 class _HomeNoteState extends State<HomeNote> {
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,16 +48,15 @@ class _HomeNoteState extends State<HomeNote> {
 
   Widget searchView() {
     return Container(
-      margin: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 10),
-      child: CustomTextField(prefixIcon: true)
-    );
+        margin: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 10),
+        child: CustomTextField(prefixIcon: true));
   }
 
   Widget textIcloud() {
     return Container(
       margin: EdgeInsetsDirectional.fromSTEB(20, 20, 20, 10),
-      child:
-          Text(ContainString.icloud, style: TextStyle(color: Colors.white, fontSize: 30)),
+      child: Text(ContainString.icloud,
+          style: TextStyle(color: Colors.white, fontSize: 30)),
     );
   }
 
@@ -68,7 +71,11 @@ class _HomeNoteState extends State<HomeNote> {
               onTap: () => {
                     showDialog(
                         context: context,
-                        builder: (context) => CreateFolderDialog(ContainString.createNameFolder, ContainString.cancel, ContainString.save))},
+                        builder: (context) => CreateFolderDialog(
+                            ContainString.createNameFolder,
+                            ContainString.cancel,
+                            ContainString.save))
+                  },
               child: Icon(Icons.create_new_folder_outlined,
                   color: Colors.yellowAccent, size: 24)),
           Expanded(child: SizedBox()),

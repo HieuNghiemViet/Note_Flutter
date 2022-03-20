@@ -18,7 +18,7 @@ class CreateFolderDialog extends StatelessWidget {
         content: CustomTextField(hintText: 'Tạo'),
         actions: [
           TextButton(
-            onPressed: () => {Navigator.pop(context)},
+            onPressed: () => {Navigator.pop(context),  print('HieuNV: ' + CustomTextField().controller.text),},
             child: Text(cancel!,
               style: TextStyle(color: Colors.yellow),
             ),
