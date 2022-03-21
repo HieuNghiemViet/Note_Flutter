@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 class CustomTextField extends StatelessWidget {
   bool? prefixIcon;
   String? hintText;
+  Function(String)? callBack;
   final controller = TextEditingController();
 
-  CustomTextField({this.prefixIcon, this.hintText = 'Tìm kiếm'});
+  CustomTextField({this.prefixIcon, this.hintText = 'Tìm kiếm', this.callBack});
 
   @override
   Widget build(BuildContext context) {
@@ -15,6 +16,10 @@ class CustomTextField extends StatelessWidget {
       autofocus: true,
       style: const TextStyle(color: Colors.white, fontSize: 10),
       cursorColor: Colors.white,
+      onChanged: (value) {
+        print("onChanged $value");
+        callBack?.call(value);
+      },
       decoration: InputDecoration(
           contentPadding:
           const EdgeInsets.symmetric(vertical: 8, horizontal: 8),

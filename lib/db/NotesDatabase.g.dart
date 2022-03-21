@@ -149,7 +149,7 @@ class _$NotesDao extends NotesDao {
   @override
   Future<void> deleteNotesById(int id) async {
     await _queryAdapter
-        .queryNoReturn('DELETE * FROM Notes WHERE id=?1', arguments: [id]);
+        .queryNoReturn('DELETE FROM Notes WHERE id=?1', arguments: [id]);
   }
 
   @override

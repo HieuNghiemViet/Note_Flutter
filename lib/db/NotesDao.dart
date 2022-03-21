@@ -16,7 +16,7 @@ abstract class NotesDao {
   @Query('SELECT * FROM Notes WHERE id=:id')
   Future<Notes?> findNotesById(int id);
 
-  @Query('DELETE * FROM Notes WHERE id=:id')
+  @Query('DELETE FROM Notes WHERE id=:id')
   Future<void> deleteNotesById(int id);
 
 }

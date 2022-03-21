@@ -8,6 +8,10 @@ import Flutter
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
+      let dirPaths = NSSearchPathForDirectoriesInDomains(.applicationDirectory,
+                                                         .userDomainMask, true)
+      print("Dirpaths \(dirPaths)")
+      
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
