@@ -8,9 +8,15 @@ class CreateFolderDialog extends StatelessWidget {
   String? save;
   String? nameTitle;
   Function(String)? onSave;
+  Function? callbackReload;
 
   CreateFolderDialog(
-      {Key? key, this.nameDialog, this.cancel, this.save, this.onSave})
+      {Key? key,
+      this.nameDialog,
+      this.cancel,
+      this.save,
+      this.onSave,
+      this.callbackReload})
       : super(key: key);
 
   @override
@@ -20,28 +26,28 @@ class CreateFolderDialog extends StatelessWidget {
       child: CupertinoAlertDialog(
         title: Text(
           nameDialog!,
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
-        content: CustomTextField(hintText: 'Tạo', callBack: onTitleChange
-            // callBack: onTitleChange,
-            //callBack: (value) => nametitle = value,
-            ),
+        content: CustomTextField(
+            hintText: 'Tạo',
+            onChanged: (name) {nameTitle = name;}),
         actions: [
           TextButton(
             onPressed: () => {Navigator.pop(context)},
             child: Text(
               cancel!,
-              style: TextStyle(color: Colors.yellow),
+              style: const TextStyle(color: Colors.yellow),
             ),
           ),
           TextButton(
               onPressed: () {
-                onSave?.call(nameTitle ?? "");
+                onSave?.call(nameTitle!);
+                callbackReload?.call();
                 Navigator.pop(context);
               },
               child: Text(
                 save!,
-                style: TextStyle(color: Colors.yellow),
+                style: const TextStyle(color: Colors.yellow),
               ))
         ],
       ),

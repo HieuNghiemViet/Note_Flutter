@@ -3,13 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:note_futter/constain/CustomTextField.dart';
 import 'package:note_futter/constain/String.dart';
-import 'package:note_futter/db/NotesDao.dart';
-import 'package:note_futter/db/NotesDatabase.dart';
 import 'package:note_futter/repository/RepositoryDatabase.dart';
 import 'package:note_futter/ui/NotesListView.dart';
 import '../model/Notes.dart';
 import 'dialog/CreateFolderDialog.dart';
-import 'package:path_provider/path_provider.dart';
 
 class HomeNote extends StatefulWidget {
   const HomeNote({Key? key}) : super(key: key);
@@ -20,23 +17,40 @@ class HomeNote extends StatefulWidget {
 
 class _HomeNoteState extends State<HomeNote> {
   List<Notes>? _list;
-
+  List<Notes> listFilter = [];
+  String textSearch = "";
+  bool isSearch = false;
 
   @override
   void initState() {
-    print('initState');
     super.initState();
     getAllNotes();
 
-
+    // getAllNotesvar listNote = [Notes(id: 1, title: "note 1"), Notes(id: 2, title: "note 2"), Notes(id: 3, title: "hungtd")];
+    // var array = listNote.map((e) => e.title);
+    // var filter = listNote.where((element) => element.title?.contains("note") ?? false);
+    // print(array);
+    // print(filter);
+    // for(final a in filter) {
+    //   print("${a.title}");
+    // }
   }
 
   void getAllNotes() async {
-    print('HieuNV: GetAllNotes}');
     final reload = await RepositoryDatabase().getAllNotes();
 
     setState(() {
       _list = reload;
+    });
+  }
+
+  void filterSearchNotesResults(String name) {
+    print('HieuNV: name : $name');
+    listFilter.clear();
+    listFilter = _list!.where((element) => element.title!.toLowerCase().contains(name)).toList();
+
+    setState(() {
+      isSearch = name.isNotEmpty;
     });
   }
 
@@ -53,12 +67,12 @@ class _HomeNoteState extends State<HomeNote> {
             textIcloud(),
             _list != null
                 ? Expanded(
-              child: NotesListView(
-                  notesList: _list,
-                  callback: () {
-                    getAllNotes();
-                  }),
-            )
+                    child: NotesListView(
+                        notesList: isSearch == true ? listFilter : _list,
+                        callback: () {
+                          getAllNotes();
+                        }),
+                  )
                 : Container(),
             createFolderAndFile(context)
           ],
@@ -70,8 +84,8 @@ class _HomeNoteState extends State<HomeNote> {
   Widget nameTitle() {
     return Container(
       width: double.infinity,
-      margin: EdgeInsetsDirectional.fromSTEB(20, 40, 0, 10),
-      child: Text(ContainString.folder,
+      margin: const EdgeInsetsDirectional.fromSTEB(20, 40, 0, 10),
+      child: const Text(ContainString.folder,
           style: TextStyle(
               color: Colors.white, fontSize: 35, fontWeight: FontWeight.bold)),
     );
@@ -79,14 +93,18 @@ class _HomeNoteState extends State<HomeNote> {
 
   Widget searchView() {
     return Container(
-        margin: EdgeInsetsDirectional.fromSTEB(20, 0, 20, 10),
-        child: CustomTextField(prefixIcon: true));
+        margin: const EdgeInsetsDirectional.fromSTEB(20, 0, 20, 10),
+        child: CustomTextField(
+          prefixIcon: true,
+          onChanged: (value) {filterSearchNotesResults(value);
+          },
+        ));
   }
 
   Widget textIcloud() {
     return Container(
-      margin: EdgeInsetsDirectional.fromSTEB(20, 20, 20, 10),
-      child: Text(ContainString.icloud,
+      margin: const EdgeInsetsDirectional.fromSTEB(20, 20, 20, 10),
+      child: const Text(ContainString.icloud,
           style: TextStyle(color: Colors.white, fontSize: 30)),
     );
   }
@@ -95,29 +113,29 @@ class _HomeNoteState extends State<HomeNote> {
     return SafeArea(
       child: Row(
         children: [
-          SizedBox(
-            width: 20,
-          ),
+          const SizedBox(
+            width: 20),
           InkWell(
               onTap: () => {
-                showDialog(
-                    context: (context),
-                    builder: (context) =>
-                        CreateFolderDialog(
-                          nameDialog: ContainString.createNameFolder,
-                          cancel: ContainString.cancel,
-                          save: ContainString.save,
-                          onSave: addNote,
-                        ))
-              },
-              child: Icon(Icons.create_new_folder_outlined,
+                    showDialog(
+                        context: (context),
+                        builder: (context) => CreateFolderDialog(
+                            nameDialog: ContainString.createNameFolder,
+                            cancel: ContainString.cancel,
+                            save: ContainString.save,
+                            onSave: addNote,
+                            callbackReload: () {
+                              getAllNotes();
+                            }))
+                  },
+              child: const Icon(Icons.create_new_folder_outlined,
                   color: Colors.yellowAccent, size: 24)),
-          Expanded(child: SizedBox()),
+          const Expanded(child: SizedBox()),
           InkWell(
               onTap: () => {},
-              child: Icon(Icons.create_outlined,
+              child: const Icon(Icons.create_outlined,
                   color: Colors.yellowAccent, size: 24)),
-          SizedBox(
+          const SizedBox(
             width: 20,
           )
         ],
@@ -127,14 +145,8 @@ class _HomeNoteState extends State<HomeNote> {
 
   // void addTest() {
   void addNote(String noteName) {
-    print('addNote: ${noteName}');
-    var notes = new Notes(title: noteName);
+    print('addNote: $noteName');
+    var notes = Notes(title: noteName);
     RepositoryDatabase().insertNoteDatabase(notes);
-  }
-
-  Future locaPath() async {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String appDocPath = appDocDir.path;
-    print("local path $appDocPath");
   }
 }

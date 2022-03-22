@@ -10,6 +10,7 @@ class NotesListView extends StatelessWidget {
 
   NotesListView({Key? key, this.notesList, this.callback}) : super(key: key);
 
+
   @override
   Widget build(BuildContext context) {
     return notesList!.length != null
@@ -39,8 +40,12 @@ class NotesListView extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () =>
-            {Navigator.pushNamed(context, '/notes_detail', arguments: notes)},
+        onTap: () async{
+          await Navigator.pushNamed(context, '/notes_detail', arguments: notes);
+          print("BACKED");
+          callback?.call();
+
+        },
         onLongPress: () async {
           print(notes.id!.toInt());
           await RepositoryDatabase().deleteNoteDatabase(notes.id ?? 0);
@@ -64,15 +69,10 @@ class NotesListView extends StatelessWidget {
             style: const TextStyle(color: Colors.white, fontSize: 20),
           ),
         ),
-        const Text(
-          '6',
+         Text(notes.id.toString(),
           style: TextStyle(color: Colors.grey, fontSize: 20),
         ),
       ],
     );
   }
-
-// void deleteNoteById() {
-//   RepositoryDatabase().deleteNoteDatabase(14);
-// }
 }
