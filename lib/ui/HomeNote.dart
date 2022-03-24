@@ -1,9 +1,10 @@
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:note_futter/constain/CustomTextField.dart';
 import 'package:note_futter/constain/String.dart';
-import 'package:note_futter/repository/RepositoryDatabase.dart';
+import 'package:note_futter/cubit/homecubit/home_cubit.dart';
+import 'package:note_futter/cubit/homecubit/home_state.dart';
 import 'package:note_futter/ui/NotesListView.dart';
 import '../model/Notes.dart';
 import 'dialog/CreateFolderDialog.dart';
@@ -16,69 +17,48 @@ class HomeNote extends StatefulWidget {
 }
 
 class _HomeNoteState extends State<HomeNote> {
-  List<Notes>? _list;
-  List<Notes> listFilter = [];
-  String textSearch = "";
-  bool isSearch = false;
-
   @override
   void initState() {
     super.initState();
-    getAllNotes();
-
-    // getAllNotesvar listNote = [Notes(id: 1, title: "note 1"), Notes(id: 2, title: "note 2"), Notes(id: 3, title: "hungtd")];
-    // var array = listNote.map((e) => e.title);
-    // var filter = listNote.where((element) => element.title?.contains("note") ?? false);
-    // print(array);
-    // print(filter);
-    // for(final a in filter) {
-    //   print("${a.title}");
-    // }
-  }
-
-  void getAllNotes() async {
-    final reload = await RepositoryDatabase().getAllNotes();
-
-    setState(() {
-      _list = reload;
-    });
-  }
-
-  void filterSearchNotesResults(String name) {
-    print('HieuNV: name : $name');
-    listFilter.clear();
-    listFilter = _list!.where((element) => element.title!.toLowerCase().contains(name)).toList();
-
-    setState(() {
-      isSearch = name.isNotEmpty;
-    });
+    BlocProvider.of<HomeCubit>(context).getAllNotes();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        color: Colors.black,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            nameTitle(),
-            searchView(),
-            textIcloud(),
-            _list != null
-                ? Expanded(
-                    child: NotesListView(
-                        notesList: isSearch == true ? listFilter : _list,
-                        callback: () {
-                          getAllNotes();
-                        }),
-                  )
-                : Container(),
-            createFolderAndFile(context)
-          ],
-        ),
+        body: Container(
+      color: Colors.black,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          nameTitle(),
+          searchView(),
+          textIcloud(),
+          BlocBuilder<HomeCubit, HomeState>(
+            builder: (context, state) {
+              return state.listNotes.isNotEmpty
+                  ? Expanded(
+                      child: NotesListView(
+                        notesList:
+                            state.isSearch ? state.listFilter : state.listNotes,
+                        onDeleteNote: (note) {
+                          context.read<HomeCubit>().deleteNote(note);
+                        },
+                        onTapNote: (note) async {
+                          await Navigator.pushNamed(context, '/notes_detail',
+                              arguments: note);
+                          // not getAllNotes
+                          context.read<HomeCubit>().getAllNotes();
+                        },
+                      ),
+                    )
+                  : Container();
+            },
+          ),
+          createFolderAndFile(context)
+        ],
       ),
-    );
+    ));
   }
 
   Widget nameTitle() {
@@ -96,8 +76,8 @@ class _HomeNoteState extends State<HomeNote> {
         margin: const EdgeInsetsDirectional.fromSTEB(20, 0, 20, 10),
         child: CustomTextField(
           prefixIcon: true,
-          onChanged: (value) {filterSearchNotesResults(value);
-          },
+          onChanged: (name) =>
+              context.read<HomeCubit>().filterSearchNotesResults(name),
         ));
   }
 
@@ -109,24 +89,24 @@ class _HomeNoteState extends State<HomeNote> {
     );
   }
 
-  Widget createFolderAndFile(BuildContext context) {
+  Widget createFolderAndFile(BuildContext homeContext) {
     return SafeArea(
       child: Row(
         children: [
-          const SizedBox(
-            width: 20),
+          const SizedBox(width: 20),
           InkWell(
               onTap: () => {
                     showDialog(
-                        context: (context),
-                        builder: (context) => CreateFolderDialog(
-                            nameDialog: ContainString.createNameFolder,
-                            cancel: ContainString.cancel,
-                            save: ContainString.save,
-                            onSave: addNote,
-                            callbackReload: () {
-                              getAllNotes();
-                            }))
+                      context: (homeContext),
+                      builder: (context) => CreateFolderDialog(
+                        nameDialog: ContainString.createNameFolder,
+                        cancel: ContainString.cancel,
+                        save: ContainString.save,
+                        onSave: (name) {
+                          BlocProvider.of<HomeCubit>(homeContext).addNote(name);
+                        },
+                      ),
+                    )
                   },
               child: const Icon(Icons.create_new_folder_outlined,
                   color: Colors.yellowAccent, size: 24)),
@@ -141,12 +121,5 @@ class _HomeNoteState extends State<HomeNote> {
         ],
       ),
     );
-  }
-
-  // void addTest() {
-  void addNote(String noteName) {
-    print('addNote: $noteName');
-    var notes = Notes(title: noteName);
-    RepositoryDatabase().insertNoteDatabase(notes);
   }
 }

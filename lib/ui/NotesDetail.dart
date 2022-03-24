@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:note_futter/cubit/detailcubit/detail_cubit.dart';
+import 'package:note_futter/cubit/homecubit/home_cubit.dart';
 import 'package:note_futter/repository/RepositoryDatabase.dart';
 
 import '../model/Notes.dart';
@@ -18,7 +21,6 @@ class _NotesDetailState extends State<NotesDetail> {
   @override
   void initState() {
     if (widget.notes?.description != null) {
-      print("set ${widget.notes?.description}");
       descriptionController.text = widget.notes!.description!;
     }
   }
@@ -50,14 +52,8 @@ class _NotesDetailState extends State<NotesDetail> {
                   fontSize: 35,
                   fontWeight: FontWeight.bold)),
           InkWell(
-              onTap: () {
-                final description = Notes(
-                    id: widget.notes!.id,
-                    title: widget.notes!.title,
-                    description: descriptionController.text);
-                RepositoryDatabase().updateNoteDatabase(description);
-              },
-              child: Text('Xong',
+              onTap: () {updateNote();},
+              child: const Text('Xong',
                   style: TextStyle(color: Colors.yellow, fontSize: 20)))
         ],
       ),
@@ -78,8 +74,16 @@ class _NotesDetailState extends State<NotesDetail> {
         keyboardType: TextInputType.multiline,
         maxLines: null,
         maxLength: null,
-        decoration: InputDecoration(focusedBorder: InputBorder.none),
+        decoration: const InputDecoration(focusedBorder: InputBorder.none),
       ),
     );
+  }
+
+  void updateNote() {
+    final notes = Notes(
+        id: widget.notes!.id,
+        title: widget.notes!.title,
+        description: descriptionController.text);
+    context.read<DetailCubit>().updateNote(notes);
   }
 }

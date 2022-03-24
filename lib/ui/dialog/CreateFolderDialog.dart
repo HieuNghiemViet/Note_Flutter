@@ -8,15 +8,14 @@ class CreateFolderDialog extends StatelessWidget {
   String? save;
   String? nameTitle;
   Function(String)? onSave;
-  Function? callbackReload;
+
 
   CreateFolderDialog(
       {Key? key,
       this.nameDialog,
       this.cancel,
       this.save,
-      this.onSave,
-      this.callbackReload})
+      this.onSave})
       : super(key: key);
 
   @override
@@ -42,7 +41,6 @@ class CreateFolderDialog extends StatelessWidget {
           TextButton(
               onPressed: () {
                 onSave?.call(nameTitle!);
-                callbackReload?.call();
                 Navigator.pop(context);
               },
               child: Text(
@@ -54,8 +52,4 @@ class CreateFolderDialog extends StatelessWidget {
     );
   }
 
-  void onTitleChange(String name) {
-    print("onTitleChange $name");
-    nameTitle = name;
-  }
 }

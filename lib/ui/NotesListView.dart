@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:note_futter/repository/RepositoryDatabase.dart';
-import '../db/NotesDao.dart';
-import '../db/NotesDatabase.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:note_futter/cubit/homecubit/home_cubit.dart';
 import '../model/Notes.dart';
 
 class NotesListView extends StatelessWidget {
   List<Notes>? notesList;
-  Function? callback;
+  Function(Notes)? onDeleteNote;
+  Function(Notes)? onTapNote;
 
-  NotesListView({Key? key, this.notesList, this.callback}) : super(key: key);
+  NotesListView({Key? key, this.notesList, this.onDeleteNote, this.onTapNote}) : super(key: key);
 
 
   @override
@@ -41,15 +41,10 @@ class NotesListView extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () async{
-          await Navigator.pushNamed(context, '/notes_detail', arguments: notes);
-          print("BACKED");
-          callback?.call();
-
+          onTapNote?.call(notes);
         },
-        onLongPress: () async {
-          print(notes.id!.toInt());
-          await RepositoryDatabase().deleteNoteDatabase(notes.id ?? 0);
-          callback?.call();
+        onLongPress: ()  {
+          onDeleteNote?.call(notes);
         },
         child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
